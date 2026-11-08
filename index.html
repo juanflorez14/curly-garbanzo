@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lucha | Control y autorregulación de la fuerza</title>
 <style>
-:root{--bg:#0a1220;--surface:#111d2e;--surface2:#17263b;--line:#293b54;--text:#edf4ff;--muted:#9badc5;--blue:#72b7ff;--green:#45d6a0;--yellow:#ffd166;--red:#ff7185}
+:root{--bg:#f3f6fb;--surface:#ffffff;--surface2:#edf2f8;--line:#d8e1ec;--text:#203047;--muted:#60738a;--blue:#3478c5;--green:#16845c;--yellow:#9a6813;--red:#c33e58}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.52 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}header{position:sticky;top:0;z-index:5;background:#0c1728;border-bottom:1px solid var(--line);padding:15px max(18px,calc((100% - 1220px)/2));display:flex;justify-content:space-between;align-items:center;gap:15px}h1{font-size:19px;letter-spacing:.04em;margin:0}h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 8px}.sub{color:var(--muted);font-size:12px}main{max-width:1220px;margin:24px auto;padding:0 18px}.card{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:18px;margin:0 0 16px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.four{grid-template-columns:repeat(4,minmax(0,1fr))}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.stat{font-size:28px;font-weight:750}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}label{display:block;font-size:12px;color:var(--muted);margin:9px 0 4px}input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:8px;background:#0a1729;color:var(--text);font:inherit}textarea{min-height:75px;resize:vertical}button{border:0;border-radius:8px;padding:10px 14px;background:var(--blue);color:#081525;font-weight:750;cursor:pointer}button.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--line)}button.ghost{background:transparent;color:var(--blue);border:1px solid var(--line)}button:disabled{opacity:.5;cursor:not-allowed}.nav{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0}.nav button{background:var(--surface2);border:1px solid var(--line);color:var(--muted)}.nav button.active{background:var(--blue);color:#071525}.badge{display:inline-block;border-radius:30px;padding:3px 9px;background:#223953;color:#d8eaff;font-size:11px}.good{color:var(--green)}.caution{color:var(--yellow)}.bad{color:var(--red)}.notice{padding:12px;border-radius:9px;background:#172b45;color:#d5e9ff;margin:10px 0}.notice.warn{background:#382d18;color:#ffe9b0}.notice.error{background:#3b1d2a;color:#ffd8e1}.section{margin-top:14px}.table-scroll{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:650;white-space:nowrap}.empty{color:var(--muted);padding:16px 4px}.hidden{display:none!important}.phase{padding:12px;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}.phase strong{display:block;font-size:13px}.phase span{font-size:12px;color:var(--muted)}.bar{height:9px;background:#263750;border-radius:20px;overflow:hidden;min-width:100px}.bar>span{display:block;height:100%;background:var(--blue)}.form-actions{margin-top:12px}.pill{border:1px solid var(--line);border-radius:30px;padding:3px 9px;font-size:11px;color:var(--muted)}.right{text-align:right}.footer{font-size:11px;color:var(--muted);padding:10px 0 30px}.check{display:flex;gap:8px;align-items:center}.check input{width:auto}.loader{opacity:.65}
 .actions-cell{white-space:nowrap;display:flex;gap:6px}.action-btn{padding:6px 9px;font-size:12px}.action-btn.edit{background:#203a57;color:#d9ecff;border:1px solid #3b5d80}.action-btn.delete{background:#49202d;color:#ffd9e1;border:1px solid #743448}
 dialog.record-dialog{width:min(720px,calc(100% - 28px));max-height:88vh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:15px;padding:0;box-shadow:0 20px 80px #0009}dialog.record-dialog::backdrop{background:#020817cc;backdrop-filter:blur(3px)}.dialog-head{position:sticky;top:0;background:var(--surface);padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.dialog-body{padding:16px 18px}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.field-hint{font-size:11px;color:var(--muted);margin-top:3px;grid-column:1 / -1}
@@ -40,6 +40,54 @@ dialog.record-dialog{width:min(720px,calc(100% - 28px));max-height:88vh;overflow
 .plan-fields input{padding:8px}
 .plan-reason{border-left:3px solid var(--blue);padding:9px 12px;background:#12243a;border-radius:0 8px 8px 0;margin:10px 0}
 @media(max-width:760px){.planner-grid{grid-template-columns:1fr}.plan-fields{grid-template-columns:1fr 1fr}}
+
+/* ACTUALIZACIÓN 7: tema claro y recursos demostrativos */
+body{background:var(--bg);color:var(--text)}
+header{background:#ffffff;border-bottom:1px solid var(--line);box-shadow:0 2px 12px rgba(31,55,85,.06)}
+input,select,textarea{background:#ffffff;color:var(--text);border-color:var(--line)}
+input::placeholder,textarea::placeholder{color:#8a9aab}
+button.secondary{background:#eaf0f7;color:#263b54;border:1px solid #d5dfeb}
+button.ghost{background:#ffffff;color:#2868ad;border:1px solid #d5dfeb}
+.nav button{background:#eaf0f7;border-color:#d7e0eb;color:#52677f}
+.nav button.active{background:#dbeafe;color:#174b84;border-color:#b9d3f3}
+.badge{background:#e5effb;color:#285783}
+.notice{background:#eaf3ff;color:#294b70;border:1px solid #d5e6fa}
+.notice.warn{background:#fff6df;color:#77520d;border:1px solid #f1dfae}
+.notice.error{background:#fff0f2;color:#8d2f44;border:1px solid #f0cbd2}
+.phase{background:#f8fafd;border-color:#dce5ef}
+.bar{background:#e5ebf2}
+.pill{border-color:#d8e1ec;color:#60738a}
+.exercise-detail{background:#f7f9fc;border-color:#dce5ef}
+.exercise-card{background:#ffffff;border-color:#dce5ef}
+.exercise-option{background:#f7f9fc;border-color:#dce5ef}
+.exercise-tag{background:#e7f0fb;color:#315d88}
+.exercise-tags .exercise-tag{border:1px solid #d7e5f5}
+.exercise-warning{border-color:#e6c98a;background:#fffbf1}
+.compat-badge.ok{background:#e3f6ed;color:#176545}
+.compat-badge.caution{background:#fff3d5;color:#83580b}
+.compat-badge.blocked{background:#fde9ed;color:#96364b}
+.plan-exercise,.planner-metric{background:#f7f9fc;border-color:#dce5ef}
+.plan-reason{background:#eaf3ff;color:#294b70}
+.donut-empty{border-color:#d5dfeb}
+.donut-caption{fill:#60738a}
+.donut-total{fill:#203047}
+dialog.record-dialog{background:#ffffff;color:var(--text);border-color:#d8e1ec;box-shadow:0 20px 70px rgba(25,45,70,.18)}
+.dialog-head{background:#ffffff;border-bottom-color:#e2e8f0}
+dialog.record-dialog::backdrop{background:rgba(28,43,62,.36);backdrop-filter:blur(3px)}
+.action-btn.edit{background:#e6f0fc;color:#245889;border-color:#c8dcf4}
+.action-btn.delete{background:#fde9ed;color:#96364b;border-color:#f3ccd5}
+.demo-panel{margin-top:11px;padding:10px 11px;border:1px solid #dbe5ef;border-radius:10px;background:#f8fafd}
+.demo-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
+.demo-link{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #cdddf0;border-radius:8px;background:#edf5ff;color:#245a91;text-decoration:none;font-size:12px;font-weight:650}
+.demo-link:hover{background:#e1efff}
+.demo-preview{display:block;max-width:100%;max-height:220px;object-fit:contain;border-radius:8px;margin-top:9px;background:#e7edf5}
+.demo-config{margin-top:9px;border-top:1px dashed #d5dfeb;padding-top:8px}
+.demo-config summary{cursor:pointer;color:#315d88;font-size:12px;font-weight:700}
+.demo-config-grid{display:grid;grid-template-columns:130px minmax(0,1fr);gap:8px;margin-top:8px}
+.demo-config input,.demo-config select{font-size:12px;padding:8px}
+.demo-config button{font-size:12px;padding:8px 11px}
+@media(max-width:520px){.demo-config-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -309,6 +357,27 @@ function compatibilityBadge(comp){
  if(comp.level==='monitor')return '<span class="compat-badge caution">Antecedente: vigilar tolerancia</span>';
  return '<span class="compat-badge ok">Sin coincidencia directa detectada</span>';
 }
+
+function validHttpUrl(raw){
+ try{const u=new URL(String(raw||'').trim());return ['http:','https:'].includes(u.protocol)&&!u.username&&!u.password?u.href:null}catch{return null}
+}
+function exerciseVideoSearchUrl(name){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(`${name} demostración técnica ejercicio`)}
+function exerciseImageSearchUrl(name){return 'https://www.google.com/search?tbm=isch&q='+encodeURIComponent(`${name} ejercicio técnica`)}
+function exerciseDemoMarkup(exercise,{editable=false,compact=false}={}){
+ const url=validHttpUrl(exercise.demo_url);const type=exercise.demo_type||'video';
+ let visual='';
+ if(url&&(type==='imagen'||type==='gif')) visual=`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer"><img class="demo-preview" src="${esc(url)}" loading="lazy" alt="Demostración visual de ${esc(exercise.name)}"></a>`;
+ const resource=url
+  ? (type==='imagen'?'Abrir imagen':type==='gif'?'Abrir GIF':'Ver video demostrativo')
+  : 'Buscar video demostrativo';
+ const resourceUrl=url||exerciseVideoSearchUrl(exercise.name);
+ const searchImg=`<a class="demo-link" href="${exerciseImageSearchUrl(exercise.name)}" target="_blank" rel="noopener noreferrer">Buscar imagen / GIF</a>`;
+ const resourceLink=`<a class="demo-link" href="${esc(resourceUrl)}" target="_blank" rel="noopener noreferrer">${resource}</a>`;
+ const caption=exercise.demo_caption?`<p class="small">${esc(exercise.demo_caption)}</p>`:'';
+ const editor=editable?`<details class="demo-config"><summary>${url?'Editar recurso visual':'Añadir enlace de video, imagen o GIF'}</summary><form data-demo-form="${exercise.id}"><div class="demo-config-grid"><div><label>Tipo de recurso</label><select name="demo_type"><option value="video" ${type==='video'?'selected':''}>Video / enlace</option><option value="imagen" ${type==='imagen'?'selected':''}>Imagen</option><option value="gif" ${type==='gif'?'selected':''}>GIF animado</option></select></div><div><label>URL pública del recurso</label><input name="demo_url" type="url" value="${esc(exercise.demo_url||'')}" placeholder="https://…"></div></div><label>Nota técnica (opcional)</label><input name="demo_caption" type="text" value="${esc(exercise.demo_caption||'')}" placeholder="Ej. variante desde posición inicial; observar alineación del tronco"><div class="demo-actions"><button type="submit">Guardar recurso</button><button type="button" class="secondary" data-demo-clear="${exercise.id}">Quitar recurso</button></div><p class="small">Usa enlaces públicos HTTPS. Para imágenes o GIF, pega la dirección directa del archivo. Para videos, pega el enlace de la plataforma donde está alojado.</p></form></details>`:'';
+ return `<div class="demo-panel"><div class="small"><strong>Demostración:</strong> ${url?'Recurso añadido al ejercicio':'Todavía no hay un recurso específico guardado.'}</div><div class="demo-actions">${resourceLink}${url?searchImg:`<a class="demo-link" href="${exerciseImageSearchUrl(exercise.name)}" target="_blank" rel="noopener noreferrer">Buscar imagen / GIF</a>`}</div>${visual}${caption}${editor}</div>`;
+}
+
 function renderExerciseChoices(){
  const target=$('exerciseChoices');if(!target)return;const type=$('sessionTypeSelect')?.value||'';
  if(!type){target.innerHTML='<div class="no-exercises">Primero selecciona el tipo de sesión para ver recomendaciones.</div>';renderSelectedExerciseDetails();return}
@@ -326,7 +395,7 @@ function renderExerciseChoices(){
   const alternatives=considerAlternatives?compatibleAlternatives(x,type):[];
   const alternativeHtml=considerAlternatives?`<div class="notice warn"><strong>${alternatives.length?'Alternativas para conversar con el entrenador:':'No se identificó una alternativa clasificada para este tipo de sesión.'}</strong>${alternatives.length?`<p>${alternatives.map(esc).join(' · ')}</p>`:`<p>Se recomienda conversar con el entrenador para valorar el cambio de este ejercicio o la modificación de la sesión.</p>`}<span class="small">La selección final debe considerar la respuesta del deportista y, cuando corresponda, la orientación del profesional de salud.</span></div>`:'';
   const overrideText=unclassified?'<p class="small bad">No se puede seleccionar hasta que el entrenador revise y complete la clasificación de demandas del ejercicio en el catálogo.</p>':(requiresCoach?(availableForCoach?'<p class="small caution">Solo el entrenador puede seleccionarlo y debe confirmar la indicación profesional y documentar la adaptación.</p>':'<p class="small bad">No seleccionable hasta contar con orientación profesional documentada y revisar las restricciones.</p>'): '');
-  return `<div class="exercise-option ${requiresCoach||unclassified?'exercise-warning':''}"><label><input type="checkbox" data-exercise-choice="${x.id}" ${checked?'checked':''} ${disabled?'disabled':''}><span><strong>${esc(x.name)}</strong><br><span class="small">${esc(x.primary_area||x.category)} · ${esc(x.level)} · ${esc(x.equipment||'Sin material especificado')}</span></span></label><div class="compatibility-line">${compatibilityBadge(comp)}</div><p>${esc(x.description||'')}</p><p><strong>Demandas:</strong> ${esc((x.movement_demands||[]).join(', ')||'No clasificadas')} · <strong>Impacto:</strong> ${esc(x.impact_level||'No definido')}</p><p><strong>Zona(s) a vigilar:</strong> ${esc((x.injury_watch_areas||[]).join(', ')||'No clasificadas')}</p><p><strong>Sugerencia:</strong> ${x.suggested_sets||'—'} × ${x.suggested_reps||'—'} ${esc(x.dose_unit||'repeticiones')} · CE orientativo ${esc(x.suggested_ce||'no aplica / por definir')}</p><p>${usage.count?`Usado ${usage.count} vez/veces · último registro: ${esc(usage.last||'—')}`:'Sin registros previos de este deportista'}</p><p class="small">${esc(comp.reason)}</p>${alternativeHtml}${overrideText}</div>`
+  return `<div class="exercise-option ${requiresCoach||unclassified?'exercise-warning':''}"><label><input type="checkbox" data-exercise-choice="${x.id}" ${checked?'checked':''} ${disabled?'disabled':''}><span><strong>${esc(x.name)}</strong><br><span class="small">${esc(x.primary_area||x.category)} · ${esc(x.level)} · ${esc(x.equipment||'Sin material especificado')}</span></span></label><div class="compatibility-line">${compatibilityBadge(comp)}</div><p>${esc(x.description||'')}</p>${exerciseDemoMarkup(x,{compact:true})}<p><strong>Demandas:</strong> ${esc((x.movement_demands||[]).join(', ')||'No clasificadas')} · <strong>Impacto:</strong> ${esc(x.impact_level||'No definido')}</p><p><strong>Zona(s) a vigilar:</strong> ${esc((x.injury_watch_areas||[]).join(', ')||'No clasificadas')}</p><p><strong>Sugerencia:</strong> ${x.suggested_sets||'—'} × ${x.suggested_reps||'—'} ${esc(x.dose_unit||'repeticiones')} · CE orientativo ${esc(x.suggested_ce||'no aplica / por definir')}</p><p>${usage.count?`Usado ${usage.count} vez/veces · último registro: ${esc(usage.last||'—')}`:'Sin registros previos de este deportista'}</p><p class="small">${esc(comp.reason)}</p>${alternativeHtml}${overrideText}</div>`
  }).join('');renderSelectedExerciseDetails();
 }
 function renderSelectedExerciseDetails(){
@@ -392,10 +461,32 @@ async function viewExerciseBank(c){
    const flagged=['restricted','review','unclassified'].includes(comp.level)||(comp.level==='monitor'&&impactRank(x.impact_level)>=2);
    const alternatives=flagged?compatibleAlternatives(x,filter):[];
    const alt=flagged?`<div class="notice warn"><strong>${alternatives.length?'Alternativas para conversar con el entrenador:':'No se identificó una alternativa clasificada para este tipo de sesión.'}</strong>${alternatives.length?`<ul>${alternatives.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>`:`<p>Se recomienda conversar con el entrenador para valorar el cambio de este ejercicio o la modificación de la sesión.</p>`}<span class="small">Las opciones son orientativas; no constituyen sustituciones automáticas ni prescripciones terapéuticas.</span></div>`:'';
-   return `<article class="exercise-card ${flagged?'exercise-warning':''}"><div class="row between"><h3>${esc(x.name)}</h3>${compatibilityBadge(comp)}</div><p>${esc(x.description||'')}</p><p><strong>Zona principal:</strong> ${esc(x.primary_area||'No especificada')} · <strong>Nivel:</strong> ${esc(x.level)}</p><p><strong>Material:</strong> ${esc(x.equipment||'No especificado')}</p><p><strong>Demandas:</strong> ${esc((x.movement_demands||[]).join(', ')||'No clasificadas')} · <strong>Impacto catalogado:</strong> ${esc(x.impact_level||'No definido')}</p><p><strong>Zonas a vigilar:</strong> ${esc((x.injury_watch_areas||[]).join(', ')||'Sin clasificación')}</p><p><strong>Dosificación orientativa:</strong> ${x.suggested_sets||'—'} × ${x.suggested_reps||'—'} ${esc(x.dose_unit||'repeticiones')} · CE ${esc(x.suggested_ce||'no aplica / por definir')}</p><p><strong>Clave técnica:</strong> ${esc(x.coaching_cues||'Aplicar supervisión técnica.')}</p><div class="exercise-tags">${(x.session_types||[]).map(t=>`<span class="exercise-tag">${esc(t)}</span>`).join('')}</div><p class="small">${esc(comp.reason)}</p>${alt}<p class="section">${usage.count?`Historial de ${usage.count} registro(s) · última vez: ${esc(usage.last||'—')}`:'Sin registros para este deportista'}</p></article>`;
+   return `<article class="exercise-card ${flagged?'exercise-warning':''}"><div class="row between"><h3>${esc(x.name)}</h3>${compatibilityBadge(comp)}</div><p>${esc(x.description||'')}</p><p><strong>Zona principal:</strong> ${esc(x.primary_area||'No especificada')} · <strong>Nivel:</strong> ${esc(x.level)}</p><p><strong>Material:</strong> ${esc(x.equipment||'No especificado')}</p><p><strong>Demandas:</strong> ${esc((x.movement_demands||[]).join(', ')||'No clasificadas')} · <strong>Impacto catalogado:</strong> ${esc(x.impact_level||'No definido')}</p><p><strong>Zonas a vigilar:</strong> ${esc((x.injury_watch_areas||[]).join(', ')||'Sin clasificación')}</p><p><strong>Dosificación orientativa:</strong> ${x.suggested_sets||'—'} × ${x.suggested_reps||'—'} ${esc(x.dose_unit||'repeticiones')} · CE ${esc(x.suggested_ce||'no aplica / por definir')}</p><p><strong>Clave técnica:</strong> ${esc(x.coaching_cues||'Aplicar supervisión técnica.')}</p>${exerciseDemoMarkup(x,{editable:profile.role==='coach'})}<div class="exercise-tags">${(x.session_types||[]).map(t=>`<span class="exercise-tag">${esc(t)}</span>`).join('')}</div><p class="small">${esc(comp.reason)}</p>${alt}<p class="section">${usage.count?`Historial de ${usage.count} registro(s) · última vez: ${esc(usage.last||'—')}`:'Sin registros para este deportista'}</p></article>`;
   }).join('')||'<div class="no-exercises">No hay ejercicios para ese filtro.</div>';
  };
- $('bankTypeFilter').onchange=draw;draw();$('historyExerciseSelect').onchange=()=>renderExerciseHistory($('historyExerciseSelect').value);
+ $('bankTypeFilter').onchange=draw;draw();
+ $('bankExerciseGrid').addEventListener('submit',async e=>{
+  const form=e.target.closest('[data-demo-form]');if(!form)return;e.preventDefault();
+  if(profile.role!=='coach'){alert('Solo el entrenador puede modificar los recursos demostrativos del catálogo.');return}
+  const id=form.dataset.demoForm,fd=new FormData(form),raw=String(fd.get('demo_url')||'').trim(),type=String(fd.get('demo_type')||'video');
+  const url=raw?validHttpUrl(raw):null;if(raw&&!url){alert('La URL debe ser una dirección pública http:// o https:// válida.');return}
+  if(url&&!['video','imagen','gif'].includes(type)){alert('Selecciona un tipo de recurso válido.');return}
+  const payload={demo_url:url,demo_type:type,demo_caption:String(fd.get('demo_caption')||'').trim()||null};
+  const {data,error}=await db.from('exercise_catalog').update(payload).eq('id',id).select('*').maybeSingle();
+  if(error){alert('No se pudo guardar el recurso: '+error.message+' . Comprueba que ejecutaste la migración de esta actualización.');return}
+  if(!data){alert('No se modificó el ejercicio. Comprueba que has iniciado sesión como entrenador.');return}
+  const idx=exerciseCatalog.findIndex(x=>x.id===id);if(idx>=0)exerciseCatalog[idx]={...exerciseCatalog[idx],...data};
+  alert('Recurso demostrativo guardado.');draw();
+ });
+ $('bankExerciseGrid').addEventListener('click',async e=>{
+  const btn=e.target.closest('[data-demo-clear]');if(!btn)return;
+  if(profile.role!=='coach')return;
+  const id=btn.dataset.demoClear;if(!confirm('¿Quitar el recurso demostrativo guardado para este ejercicio?'))return;
+  const {data,error}=await db.from('exercise_catalog').update({demo_url:null,demo_caption:null}).eq('id',id).select('*').maybeSingle();
+  if(error){alert('No se pudo quitar el recurso: '+error.message);return}
+  if(data){const idx=exerciseCatalog.findIndex(x=>x.id===id);if(idx>=0)exerciseCatalog[idx]={...exerciseCatalog[idx],...data};draw()}
+ });
+ $('historyExerciseSelect').onchange=()=>renderExerciseHistory($('historyExerciseSelect').value);
 }
 function renderExerciseHistory(id){const target=$('exerciseHistoryResult');if(!id){target.innerHTML='<div class="no-exercises">Selecciona un ejercicio para consultar su historial.</div>';return}const rows=exerciseHistory.filter(x=>x.exercise_id===id);if(!rows.length){target.innerHTML='<div class="no-exercises">Este deportista todavía no tiene registros de este ejercicio. Puedes incorporarlo en una sesión para iniciar su seguimiento.</div>';return}const name=rows[0].exercise_catalog?.name||'Ejercicio';target.innerHTML=recordTable('Progresión de '+esc(name),['Fecha','Semana','Tipo de sesión','Series × reps','Carga (kg)','CE','RPE'],rows,x=>[x.training_sessions?.session_date||'—',x.training_sessions?.week||'—',x.training_sessions?.session_type||'—',`${x.sets} × ${x.reps} ${x.dose_unit||'repeticiones'}`,x.external_load_kg==null?'Peso corporal / no consignada':x.external_load_kg,x.effort_character||'No calculado',x.exercise_rpe??'—'],'training_session_exercises')}
 function testForm(){return formCard('Registrar prueba física','testForm',input('Fecha','test_date','date')+input('Semana (1–8)','week','number','min="1" max="8"')+select('Prueba','test_name',['CMJ','SJ','DJ','Press banca','Sentadilla','Cargada','Sentadilla de arranque','Remo','Subida de lazo'].map(x=>`<option>${x}</option>`).join(''))+input('Resultado','result_value','number','step="any"')+select('Unidad','unit','<option>cm</option><option>W</option><option>kg</option><option>repeticiones</option><option>segundos</option><option>metros</option>')+`<div><label>Protocolo y observaciones (mismo protocolo para comparar)</label><textarea name="notes"></textarea></div>`)}
@@ -472,7 +563,7 @@ function renderPlannerExercisePicker(){
  if(plannerState.noExercise){target.innerHTML='<div class="notice error">Por los indicadores de dolor registrados, el sistema no propondrá ejercicios automáticamente. Se recomienda revisar la situación con el entrenador y el profesional de salud antes de decidir el contenido.</div>';details.innerHTML='';return}
  const candidates=planCandidateExercises(type,$('plannerWeek').value,plannerState.history);
  if(!candidates.length){target.innerHTML='<div class="notice warn">No se identificó una alternativa clasificada para este tipo de sesión. Se recomienda conversar con el entrenador para valorar el cambio del ejercicio o la modificación de la sesión.</div>';details.innerHTML='';return}
- target.innerHTML=candidates.map((x,index)=>{const checked=plannerState.selected.has(x.id);const comp=x.compatibility;return `<div class="plan-exercise"><label><input type="checkbox" data-plan-exercise="${x.id}" ${checked?'checked':''}><span><strong>${esc(x.name)}</strong><br><span class="small">${esc(x.primary_area||'Zona no especificada')} · ${esc(x.level)} · ${esc(x.equipment||'Material no especificado')}</span></span></label><div class="compatibility-line">${compatibilityBadge(comp)}</div><p class="small">${esc(x.description||'')} · Impacto: ${esc(x.impact_level||'No definido')}</p><p class="small">Sugerencia del banco: ${x.recommendedSets} × ${esc(x.suggested_reps||'—')} ${esc(x.dose_unit||'repeticiones')} · CE ${esc(x.suggested_ce||'por definir')}. ${x.usage.count?`Historial: ${x.usage.count} uso(s), último ${esc(x.usage.last||'—')}.`:'Sin historial de uso.'}</p>${index<3?'<span class="badge">Recomendación inicial</span>':''}</div>`}).join('');
+ target.innerHTML=candidates.map((x,index)=>{const checked=plannerState.selected.has(x.id);const comp=x.compatibility;return `<div class="plan-exercise"><label><input type="checkbox" data-plan-exercise="${x.id}" ${checked?'checked':''}><span><strong>${esc(x.name)}</strong><br><span class="small">${esc(x.primary_area||'Zona no especificada')} · ${esc(x.level)} · ${esc(x.equipment||'Material no especificado')}</span></span></label><div class="compatibility-line">${compatibilityBadge(comp)}</div><p class="small">${esc(x.description||'')} · Impacto: ${esc(x.impact_level||'No definido')}</p>${exerciseDemoMarkup(x,{compact:true})}<p class="small">Sugerencia del banco: ${x.recommendedSets} × ${esc(x.suggested_reps||'—')} ${esc(x.dose_unit||'repeticiones')} · CE ${esc(x.suggested_ce||'por definir')}. ${x.usage.count?`Historial: ${x.usage.count} uso(s), último ${esc(x.usage.last||'—')}.`:'Sin historial de uso.'}</p>${index<3?'<span class="badge">Recomendación inicial</span>':''}</div>`}).join('');
  details.innerHTML=Array.from(plannerState.selected.entries()).map(([id,v])=>{const x=exerciseCatalog.find(e=>e.id===id);if(!x)return '';const isReps=(x.dose_unit||'repeticiones')==='repeticiones';return `<div class="exercise-detail"><div class="row between"><div><h3>${esc(x.name)}</h3><div class="exercise-meta">Dosificación propuesta · ${esc(x.dose_unit||'repeticiones')}</div></div><button type="button" class="secondary action-btn" data-plan-remove="${id}">Quitar</button></div><div class="plan-fields"><div><label>Series</label><input type="number" min="1" data-plan-field="sets" data-plan-id="${id}" value="${esc(v.sets)}"></div><div><label>${isReps?'Repeticiones':'Cantidad por serie'}</label><input type="number" min="1" data-plan-field="reps" data-plan-id="${id}" value="${esc(v.reps)}"></div><div><label>Carga kg</label><input type="number" min="0" step="0.5" data-plan-field="external_load_kg" data-plan-id="${id}" value="${esc(v.external_load_kg)}" placeholder="Opcional"></div><div><label>Reps posibles</label><input type="number" min="1" data-plan-field="reps_possible" data-plan-id="${id}" value="${esc(v.reps_possible)}" placeholder="Opcional"></div></div><div class="plan-fields"><div><label>RPE del ejercicio</label><input type="number" min="0" max="10" step="0.5" data-plan-field="exercise_rpe" data-plan-id="${id}" value="${esc(v.exercise_rpe)}" placeholder="Opcional"></div><div class="full-span"><label>Notas / adaptación</label><input type="text" data-plan-field="notes" data-plan-id="${id}" value="${esc(v.notes)}" placeholder="Indicaciones técnicas o ajuste individual"></div></div><p class="small">CE orientativo propuesto: <strong>${esc(v.reps&&v.reps_possible?`${v.reps}(${v.reps_possible})`:'Pendiente de definir')}</strong>. La carga en kg debe seleccionarse durante la supervisión del entrenador, no inferirse de la categoría de peso.</p></div>`}).join('');
 }
 async function savePlannedSession(form){
