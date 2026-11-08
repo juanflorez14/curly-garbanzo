@@ -88,6 +88,49 @@ dialog.record-dialog::backdrop{background:rgba(28,43,62,.36);backdrop-filter:blu
 .demo-config button{font-size:12px;padding:8px 11px}
 @media(max-width:520px){.demo-config-grid{grid-template-columns:1fr}}
 
+
+/* ACTUALIZACION 8: calendario, workout stats e informe imprimible */
+.dashboard-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:15px;margin:0 0 16px}
+.dashboard-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dashboard-stat{background:#f7f9fc;border:1px solid #dce5ef;border-radius:12px;padding:13px;min-width:0}
+.dashboard-stat .kpi{font-size:25px;line-height:1.2;font-weight:800;color:#244767;margin:5px 0}
+.dashboard-stat .label{font-size:11px;color:#6b7d91}
+.dashboard-stat .detail{font-size:11px;color:#7c8da1}
+.calendar-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:10px 0 13px}
+.calendar-title{font-size:17px;font-weight:800;text-transform:capitalize}
+.calendar-nav{display:flex;gap:6px}
+.calendar-nav button{padding:6px 10px;font-size:12px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.calendar-weekday{text-align:center;font-size:10px;color:#71839a;font-weight:700;padding:4px 0}
+.calendar-day{min-height:68px;border:1px solid #dfe7f0;border-radius:9px;background:#fff;color:#31455e;padding:6px 4px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;font-weight:600;min-width:0}
+.calendar-day:hover{border-color:#7ba9d8;background:#f5f9ff}
+.calendar-day.is-today{outline:2px solid #8bb9ed;outline-offset:-2px}
+.calendar-day.is-selected{background:#e7f1ff;border-color:#5c96d1}
+.calendar-day.is-outside{background:#f6f8fb;color:#aab5c2;border-style:dashed}
+.calendar-day .day-num{font-size:12px}
+.calendar-day .event-count{font-size:9px;font-weight:600;color:#71839a;line-height:1.2}
+.calendar-dots{display:flex;gap:3px;margin-top:auto}
+.calendar-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.calendar-dot.done{background:#3478c5}.calendar-dot.plan{background:#e5a52e}
+.calendar-legend{display:flex;gap:13px;flex-wrap:wrap;margin:10px 0;font-size:11px;color:#6b7d91}
+.calendar-legend span{display:inline-flex;align-items:center;gap:5px}
+.calendar-day-detail{border-top:1px solid #e2e9f1;margin-top:12px;padding-top:11px}
+.calendar-event{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #edf1f6;font-size:12px}
+.calendar-event:last-child{border-bottom:0}
+.calendar-status{font-size:10px;padding:3px 7px;border-radius:20px;white-space:nowrap}
+.calendar-status.done{background:#e6f1ff;color:#275f98}.calendar-status.plan{background:#fff4d9;color:#8a5a09}
+.weekly-bars{display:flex;align-items:flex-end;gap:8px;height:130px;padding:12px 4px 0;border-bottom:1px solid #dce5ef}
+.weekly-bar-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px}
+.weekly-bar-value{font-size:9px;color:#73859a;white-space:nowrap}
+.weekly-bar{width:min(26px,80%);border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#76aee5,#3478c5);min-height:3px}
+.weekly-bar.empty{background:#e9eef4;border:1px dashed #b9c7d6}
+.weekly-bar-label{font-size:10px;color:#6b7d91}
+.dashboard-note{font-size:11px;color:#7a8da2;line-height:1.45;margin-top:10px}
+.report-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.report-button{background:#285f98;color:#fff}
+@media(max-width:850px){.dashboard-split{grid-template-columns:1fr}}
+@media(max-width:520px){.calendar-day{min-height:54px;padding:5px 3px}.calendar-day .event-count{font-size:8px}.dashboard-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.weekly-bars{gap:4px}}
+
 </style>
 </head>
 <body>
@@ -629,6 +672,129 @@ async function saveForm(formId,tableName,mapper){const form=$(formId);form.onsub
 function n(v){return v===''||v==null?null:Number(v)}
 function dateToday(){return new Date().toISOString().slice(0,10)}
 function setupForms(){if(tab==='injuries')saveForm('injuryForm','injuries',o=>({...o,recovery_days:n(o.recovery_days),current_pain:n(o.current_pain)}));if(tab==='wellness')saveForm('wellnessForm','wellness_logs',o=>({...o,week:n(o.week),...Object.fromEntries(['fatigue','sleep_quality','muscle_soreness','pain_level','stress','motivation'].map(k=>[k,n(o[k])]))}));if(tab==='sessions')setupSessionForm();if(tab==='tests')saveForm('testForm','physical_tests',o=>({...o,week:n(o.week),result_value:n(o.result_value)}));if(tab==='decisions'&&profile.role==='coach')saveForm('decisionForm','load_decisions',o=>({...o,week:n(o.week)}));for(const f of document.querySelectorAll('input[type=date]'))if(!f.value)f.value=dateToday();setupRecordActions()}
+
+/* ===== Dashboard calendar + workout statistics ===== */
+let dashboardCalendarMonth=new Date();dashboardCalendarMonth.setDate(1);
+let dashboardSelectedDate=localISODate();
+function parseLocalISODate(value){if(!value)return null;const a=String(value).slice(0,10).split('-').map(Number);if(a.length!==3||!a[0]||!a[1]||!a[2])return null;return new Date(a[0],a[1]-1,a[2],12,0,0)}
+function isoLocalDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function prettyDate(value,options={weekday:'short',day:'2-digit',month:'short',year:'numeric'}){const d=parseLocalISODate(value);return d?new Intl.DateTimeFormat('es-CO',options).format(d):'Fecha no registrada'}
+function calendarMarkup(sessions){
+ const year=dashboardCalendarMonth.getFullYear(),month=dashboardCalendarMonth.getMonth();
+ const first=new Date(year,month,1,12),days=new Date(year,month+1,0,12).getDate(),offset=(first.getDay()+6)%7;
+ const map=new Map();for(const x of sessions||[]){if(!x.session_date)continue;if(!map.has(x.session_date))map.set(x.session_date,[]);map.get(x.session_date).push(x)}
+ const today=localISODate();
+ if(!dashboardSelectedDate||!dashboardSelectedDate.startsWith(`${year}-${String(month+1).padStart(2,'0')}`))dashboardSelectedDate=today.startsWith(`${year}-${String(month+1).padStart(2,'0')}`)?today:isoLocalDate(new Date(year,month,1,12));
+ let cells='';for(let i=0;i<offset;i++)cells+='<div class="calendar-day is-outside" aria-hidden="true"></div>';
+ for(let day=1;day<=days;day++){
+  const date=isoLocalDate(new Date(year,month,day,12)),events=map.get(date)||[],done=events.filter(x=>x.session_status!=='Planificada').length,planned=events.filter(x=>x.session_status==='Planificada').length;
+  const cls=['calendar-day',date===today?'is-today':'',date===dashboardSelectedDate?'is-selected':''].filter(Boolean).join(' ');
+  cells+=`<button type="button" class="${cls}" data-calendar-day="${date}" aria-label="${date}, ${events.length} sesión(es)"><span class="day-num">${day}</span><span class="event-count">${events.length?`${events.length} ${events.length===1?'sesión':'sesiones'}`:' '}</span><span class="calendar-dots">${done?'<i class="calendar-dot done"></i>':''}${planned?'<i class="calendar-dot plan"></i>':''}</span></button>`;
+ }
+ const remainder=(offset+days)%7;if(remainder)for(let i=remainder;i<7;i++)cells+='<div class="calendar-day is-outside" aria-hidden="true"></div>';
+ const selectedEvents=(map.get(dashboardSelectedDate)||[]).slice().sort((a,b)=>String(a.session_date).localeCompare(String(b.session_date)));
+ const details=selectedEvents.length?selectedEvents.map(x=>`<div class="calendar-event"><div><strong>${esc(x.session_type||'Sesión sin clasificar')}</strong><div class="small">Semana ${esc(x.week??'—')} · ${x.duration_minutes==null?'Duración pendiente':esc(x.duration_minutes)+' min'}${x.session_rpe==null?'':` · RPE ${esc(x.session_rpe)}`}</div></div><span class="calendar-status ${x.session_status==='Planificada'?'plan':'done'}">${x.session_status==='Planificada'?'Planificada':'Realizada'}</span></div>`).join(''):`<div class="empty">No hay sesiones registradas para este día.</div>`;
+ const title=new Intl.DateTimeFormat('es-CO',{month:'long',year:'numeric'}).format(first);
+ return `<section class="card"><div class="row between"><div><h2>Calendario de entrenamiento</h2><p class="small">Consulta las sesiones programadas y realizadas.</p></div><span class="badge">${sessions.length} registros</span></div><div class="calendar-top"><button type="button" class="secondary" data-calendar-prev aria-label="Mes anterior">‹</button><div class="calendar-title">${esc(title)}</div><button type="button" class="secondary" data-calendar-next aria-label="Mes siguiente">›</button></div><div class="calendar-grid">${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=>`<div class="calendar-weekday">${x}</div>`).join('')}${cells}</div><div class="calendar-legend"><span><i class="calendar-dot done"></i> Realizada</span><span><i class="calendar-dot plan"></i> Planificada</span><span><i class="calendar-dot" style="background:#8bb9ed"></i> Hoy / seleccionado</span></div><div class="calendar-day-detail"><strong>${esc(prettyDate(dashboardSelectedDate,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}</strong>${details}</div></section>`;
+}
+function mountDashboardCalendar(sessions){
+ const host=$('dashboardCalendar');if(!host)return;const draw=()=>{host.innerHTML=calendarMarkup(sessions);host.querySelector('[data-calendar-prev]')?.addEventListener('click',()=>{dashboardCalendarMonth.setMonth(dashboardCalendarMonth.getMonth()-1);draw()});host.querySelector('[data-calendar-next]')?.addEventListener('click',()=>{dashboardCalendarMonth.setMonth(dashboardCalendarMonth.getMonth()+1);draw()});host.querySelectorAll('[data-calendar-day]').forEach(b=>b.addEventListener('click',()=>{dashboardSelectedDate=b.dataset.calendarDay;draw()}))};draw();
+}
+function weeklyLoadBars(sessions){
+ const values=Array.from({length:8},(_,i)=>{const list=(sessions||[]).filter(x=>Number(x.week)===i+1&&sessionLoadAU(x)!=null);return list.length?sumLoadAU(list):null});
+ const max=Math.max(1,...values.filter(x=>x!=null));
+ return `<div class="weekly-bars">${values.map((v,i)=>{const h=v==null?3:Math.max(7,Math.round(v/max*88));return `<div class="weekly-bar-col"><span class="weekly-bar-value">${v==null?'—':Math.round(v)}</span><div class="weekly-bar ${v==null?'empty':''}" style="height:${h}px" title="Semana ${i+1}: ${v==null?'sin datos':v.toFixed(1)+' UA'}"></div><span class="weekly-bar-label">S${i+1}</span></div>`}).join('')}</div>`;
+}
+function workoutStatsMarkup(sessions,exerciseRows){
+ const today=localISODate(),startDate=parseLocalISODate(today);startDate.setDate(startDate.getDate()-6);const start=isoLocalDate(startDate);
+ const period=(sessions||[]).filter(x=>x.session_date>=start&&x.session_date<=today),done=period.filter(x=>x.session_status!=='Planificada'),planned=period.filter(x=>x.session_status==='Planificada');
+ const valid=done.filter(x=>sessionLoadAU(x)!=null),load=valid.length?sumLoadAU(valid):null,minutes=done.reduce((a,x)=>a+(x.duration_minutes==null?0:Number(x.duration_minutes)),0),rpe=done.filter(x=>x.session_rpe!=null),avgRpe=rpe.length?(rpe.reduce((a,x)=>a+Number(x.session_rpe),0)/rpe.length).toFixed(1):'—';
+ const doneIds=new Set(done.map(x=>x.id));const setCount=(exerciseRows||[]).filter(x=>doneIds.has(x.session_id)).reduce((a,x)=>a+Number(x.sets||0),0);
+ const metric=(label,value,detail)=>`<div class="dashboard-stat"><div class="label">${label}</div><div class="kpi">${value}</div><div class="detail">${detail}</div></div>`;
+ return `<section class="card"><div class="row between"><div><h2>Workout Stats</h2><p class="small">Actividad de los últimos siete días · ${prettyDate(start,{day:'2-digit',month:'short'})} a ${prettyDate(today,{day:'2-digit',month:'short'})}</p></div><span class="badge">Resumen semanal</span></div><div class="dashboard-stat-grid">${metric('Sesiones realizadas',done.length,`${planned.length} planificada(s) pendientes`)}${metric('Tiempo de entrenamiento',minutes?minutes+' min':'—', 'Tiempo registrado en sesiones realizadas')}${metric('Carga interna sRPE',load==null?'—':load.toFixed(1)+' UA',`${valid.length} sesión(es) con RPE y duración`)}${metric('RPE medio',avgRpe,`${rpe.length} sesión(es) con RPE registrado`)}${metric('Series de ejercicios',setCount||'—',setCount?'Series de ejercicios completadas':'Sin detalle de ejercicios en el periodo')}${metric('Sesiones del periodo',done.length+planned.length,`${done.length} realizadas · ${planned.length} planificadas`)}</div><div class="section"><div class="row between"><strong>Carga interna por semana · 8 semanas</strong><span class="small">UA</span></div>${weeklyLoadBars(sessions)}</div><p class="dashboard-note">La carga sRPE se calcula como RPE global × duración en minutos. Se muestran las sesiones con ambos datos completos; las sesiones planificadas no se suman como carga realizada. Las semanas sin registros aparecen sin datos, no como carga cero.</p></section>`;
+}
+async function viewOverview(c){
+ const [w,s,t,i,ex]=await Promise.all([fetchRows('wellness_logs',1000),fetchRows('training_sessions',1000),fetchRows('physical_tests',1000),fetchRows('injuries',1000),db.from('training_session_exercises').select('id,session_id,athlete_id,sets,reps').eq('athlete_id',activeAthleteId()).limit(2000)]);
+ for(const result of [w,s,t,i])if(result.error)throw result.error;
+ const wellness=w.data||[],sessions=s.data||[],tests=t.data||[],injuries=i.data||[],exerciseRows=ex.error?[]:(ex.data||[]);
+ const activeInjuries=injuries.filter(x=>x.status==='Activa'||x.status==='En recuperación').length;
+ const stats=`<div class="grid four"><div><div class="small">Registros de bienestar</div><div class="stat">${wellness.length}</div></div><div><div class="small">Sesiones registradas</div><div class="stat">${sessions.length}</div></div><div><div class="small">Pruebas físicas</div><div class="stat">${tests.length}</div></div><div><div class="small">Lesiones activas / en recuperación</div><div class="stat ${activeInjuries>0?'bad':''}">${activeInjuries}</div></div></div>`;
+ const description=profile.role==='coach'?'Resumen del deportista seleccionado. Cambia de deportista desde el selector superior para consultar otro perfil.':'Resumen de tu proceso individual de entrenamiento.';
+ const summary=panel('Resumen de '+esc(currentHeader()),`${stats}<p class="small">${description} Las etapas semanales son orientativas: la respuesta individual determina los ajustes.</p><div class="notice">Registra el bienestar con regularidad y completa los datos de cada sesión. No se aumenta la carga solo por cambiar de semana.</div>`);
+ const dashboard=`<div class="dashboard-split"><div id="dashboardCalendar"></div><div>${workoutStatsMarkup(sessions,exerciseRows)}</div></div>`;
+ const charts=`<div class="chart-grid">${buildDonutChart('Sesiones por tipo','Distribución de las sesiones registradas según su clasificación.',sessionTypeDistribution(sessions),'sesiones')}${buildDonutChart('Sesiones por etapa','Distribución de sesiones según la semana indicada en cada registro.',phaseDistribution(sessions),'sesiones')}${buildDonutChart('Estado de lesiones','Distribución de los antecedentes registrados en el perfil.',injuryStatusDistribution(injuries),'registros')}</div>`;
+ const seven=recentSevenDayLoad(sessions),totalLoad=sumLoadAU(sessions),validLoads=sessions.filter(x=>sessionLoadAU(x)!=null).length;
+ const loadPanel=panel('Monitoreo de carga interna acumulada',`<div class="grid three"><div><div class="small">Carga acumulada registrada</div><div class="stat">${validLoads?totalLoad.toFixed(1):'—'}</div><div class="small">UA · ${validLoads} sesión(es) con datos completos</div></div><div><div class="small">Última ventana de 7 días con sesiones completas</div><div class="stat">${seven.total==null?'—':seven.total.toFixed(1)}</div><div class="small">UA · ${seven.count} sesión(es), ${seven.start||'—'} a ${seven.end||'—'}</div></div><div><div class="small">Fórmula de carga</div><div class="stat">RPE × min</div><div class="small">Carga interna de sesión (sRPE)</div></div></div><p class="small">La carga sRPE es descriptiva y debe interpretarse junto con bienestar, rendimiento y contexto de lucha. No constituye por sí sola un umbral de riesgo.</p>`);
+ c.innerHTML=summary+dashboard+loadPanel+charts;mountDashboardCalendar(sessions);
+}
+
+/* ===== Informe individual de ocho semanas, listo para imprimir/guardar como PDF ===== */
+function reportSvgBars(weekly){
+ const values=weekly.map(x=>x.load),max=Math.max(1,...values.filter(x=>x!=null)),W=760,H=230,left=42,bottom=190,barW=48,gap=39;let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Carga sRPE por semana"><line x1="${left}" y1="${bottom}" x2="735" y2="${bottom}" stroke="#b9c7d6"/>`;
+ weekly.forEach((x,i)=>{const v=x.load,h=v==null?0:Math.max(3,(v/max)*132),px=left+14+i*(barW+gap),py=bottom-h;svg+=`<rect x="${px}" y="${py}" width="${barW}" height="${h}" rx="5" fill="${v==null?'#e4eaf1':'#3478c5'}" ${v==null?'stroke="#aab8c7" stroke-dasharray="4 3"':''}/><text x="${px+barW/2}" y="${Math.max(17,py-7)}" text-anchor="middle" font-size="11" fill="#52677f">${v==null?'—':Math.round(v)}</text><text x="${px+barW/2}" y="214" text-anchor="middle" font-size="11" fill="#52677f">S${i+1}</text>`});
+ return svg+'</svg>';
+}
+function reportFatigueSvg(weekly){
+ const pts=weekly.filter(x=>x.fatigue!=null),W=760,H=190,left=45,right=725,top=22,bottom=148;
+ if(!pts.length)return '<div class="report-empty">Sin registros de bienestar suficientes para representar la fatiga.</div>';
+ const coords=pts.map(x=>({x:left+(x.week-1)*(right-left)/7,y:bottom-(x.fatigue/10)*(bottom-top),label:x.week,val:x.fatigue}));
+ let segments=[],current=[];
+ for(const point of coords){if(current.length&&point.label!==current[current.length-1].label+1){if(current.length>1)segments.push(current);current=[];}current.push(point);}
+ if(current.length>1)segments.push(current);
+ let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tendencia de fatiga"><line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="#b9c7d6"/><line x1="${left}" y1="${top}" x2="${right}" y2="${top}" stroke="#e0e6ed"/><text x="8" y="${top+4}" font-size="11" fill="#52677f">10</text><text x="18" y="${bottom+4}" font-size="11" fill="#52677f">0</text>${segments.map(segment=>`<polyline points="${segment.map(point=>`${point.x},${point.y}`).join(' ')}" fill="none" stroke="#d09a31" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}`;
+ coords.forEach(point=>{svg+=`<circle cx="${point.x}" cy="${point.y}" r="5" fill="#d09a31"/><text x="${point.x}" y="${point.y-10}" text-anchor="middle" font-size="11" fill="#52677f">${point.val.toFixed(1)}</text><text x="${point.x}" y="172" text-anchor="middle" font-size="11" fill="#52677f">S${point.label}</text>`;});
+ return svg+'</svg>';
+}
+async function openEightWeekPdfReport(){
+ const win=window.open('','_blank');if(!win){alert('El navegador bloqueó la ventana del informe. Permite las ventanas emergentes para este sitio y vuelve a intentarlo.');return}
+ win.document.write('<!doctype html><html lang="es"><meta charset="utf-8"><title>Preparando informe</title><body style="font-family:Arial;padding:30px;color:#31455e">Preparando el informe del deportista…</body></html>');
+ try{
+  const athlete=profile.role==='coach'?athletes.find(a=>a.id===selectedId):athleteProfile;
+  const [sr,wr,tr,dr,ir,er]=await Promise.all([fetchRows('training_sessions',1000),fetchRows('wellness_logs',1000),fetchRows('physical_tests',1000),fetchRows('load_decisions',1000),fetchRows('injuries',1000),db.from('training_session_exercises').select('id,session_id,athlete_id,exercise_id,sets,reps,dose_unit,external_load_kg,effort_character,exercise_rpe,notes,exercise_catalog(name),training_sessions(session_date,week,session_type,session_status,duration_minutes,session_rpe)').eq('athlete_id',activeAthleteId()).limit(2000)]);
+  for(const r of [sr,wr,tr,dr,ir])if(r.error)throw r.error;if(er.error)throw er.error;
+  const sessions=sr.data||[],wellness=wr.data||[],tests=tr.data||[],decisions=dr.data||[],injuries=ir.data||[],exerciseRows=er.data||[];
+  const weekly=Array.from({length:8},(_,i)=>{const week=i+1,ss=sessions.filter(x=>Number(x.week)===week),done=ss.filter(x=>x.session_status!=='Planificada'),planned=ss.filter(x=>x.session_status==='Planificada'),valid=done.filter(x=>sessionLoadAU(x)!=null),ww=wellness.filter(x=>Number(x.week)===week),mean=k=>ww.length?ww.reduce((a,x)=>a+Number(x[k]||0),0)/ww.length:null;return {week,phase:phaseName(week),done:done.length,planned:planned.length,load:valid.length?sumLoadAU(valid):null,minutes:done.some(x=>x.duration_minutes!=null)?done.reduce((a,x)=>a+Number(x.duration_minutes||0),0):null,avgRpe:done.filter(x=>x.session_rpe!=null).length?done.filter(x=>x.session_rpe!=null).reduce((a,x)=>a+Number(x.session_rpe),0)/done.filter(x=>x.session_rpe!=null).length:null,fatigue:ww.length?mean('fatigue'):null,sleep:ww.length?mean('sleep_quality'):null,sessions:ss,tests:tests.filter(x=>Number(x.week)===week),decisions:decisions.filter(x=>Number(x.week)===week)}});
+  const completed=sessions.filter(x=>x.session_status!=='Planificada'),planned=sessions.filter(x=>x.session_status==='Planificada'),valid=completed.filter(x=>sessionLoadAU(x)!=null),totalLoad=valid.length?sumLoadAU(valid):null,totalMinutes=completed.reduce((a,x)=>a+Number(x.duration_minutes||0),0),avgRpe=completed.filter(x=>x.session_rpe!=null).length?completed.filter(x=>x.session_rpe!=null).reduce((a,x)=>a+Number(x.session_rpe),0)/completed.filter(x=>x.session_rpe!=null).length:null;
+  const meta=[['Nombre',athlete?.full_name||currentHeader()],['Categoría',athlete?.weight_category||'No registrada'],['Sexo',athlete?.sex||'No registrado'],['Experiencia deportiva',athlete?.sport_experience_years!=null?athlete.sport_experience_years+' años':'No registrada'],['Experiencia en fuerza',athlete?.strength_experience||'No registrada'],['Frecuencia de fuerza',athlete?.strength_days!=null?athlete.strength_days+' días/semana':'Variable / no registrada']];
+  const escRows=arr=>arr.map(x=>`<tr>${x.map(v=>`<td>${esc(v??'—')}</td>`).join('')}</tr>`).join('');
+  const weekRows=weekly.map(x=>[x.week,x.phase,`${x.done} / ${x.planned}`,x.avgRpe==null?'—':x.avgRpe.toFixed(1),x.fatigue==null?'—':x.fatigue.toFixed(1),x.load==null?'—':x.load.toFixed(1),x.minutes==null?'—':x.minutes, x.tests.length,x.decisions.length]);
+  const testMap=new Map();for(const t of tests){if(!testMap.has(t.test_name))testMap.set(t.test_name,[]);testMap.get(t.test_name).push(t)}
+  const testRows=Array.from(testMap,([name,arr])=>{arr.sort((a,b)=>String(a.test_date).localeCompare(String(b.test_date)));const first=arr[0],last=arr[arr.length-1],delta=arr.length>1&&Number(first.result_value)!==0?((Number(last.result_value)-Number(first.result_value))/Math.abs(Number(first.result_value))*100).toFixed(1)+'%':'Sin comparación';return [name,`${first.result_value} ${first.unit||''}`,`${last.result_value} ${last.unit||''}`,delta,arr.length]});
+  const completedExerciseRows=exerciseRows.filter(x=>x.training_sessions?.session_status!=='Planificada');
+  const exerciseRowsHtml=completedExerciseRows.slice().sort((a,b)=>String(a.training_sessions?.session_date||'').localeCompare(String(b.training_sessions?.session_date||''))).map(x=>[x.training_sessions?.session_date||'—',x.training_sessions?.week||'—',x.training_sessions?.session_type||'—',x.exercise_catalog?.name||'Ejercicio',`${x.sets} × ${x.reps} ${x.dose_unit||'repeticiones'}`,x.external_load_kg==null?'—':x.external_load_kg+' kg',x.effort_character||'—',x.exercise_rpe??'—']);
+  const injuryRows=injuries.map(x=>[x.body_area,x.injury_type,x.injury_grade,x.laterality,x.onset_date,x.status,x.current_pain==null?'—':x.current_pain+'/10',x.restrictions,x.professional_guidance]);
+  const decisionRows=decisions.map(x=>[x.decision_date,x.week,x.action,x.rationale]);
+  const sessionRows=sessions.slice().sort((a,b)=>String(a.session_date).localeCompare(String(b.session_date))).map(x=>[x.session_date,x.week,x.session_type||'Sin tipo',x.session_status||'Realizada',x.duration_minutes==null?'—':x.duration_minutes+' min',x.session_rpe??'—',sessionLoadAU(x)==null?(x.session_status==='Planificada'?'Pendiente':'Sin datos'):sessionLoadAU(x).toFixed(1)+' UA']);
+  const weeklyCoverage=weekly.filter(x=>x.done||x.planned||x.fatigue!=null||x.tests.length||x.decisions.length).length;
+  const generated=new Intl.DateTimeFormat('es-CO',{dateStyle:'long'}).format(new Date());
+  const doc=`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Informe de entrenamiento - ${esc(athlete?.full_name||currentHeader())}</title><style>
+  *{box-sizing:border-box}body{font:12px/1.45 Arial,Helvetica,sans-serif;color:#26384d;margin:0;background:#fff}main{max-width:1000px;margin:0 auto;padding:28px 34px}.cover{border-bottom:4px solid #3478c5;padding-bottom:18px;margin-bottom:20px}.eyebrow{color:#3478c5;text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:700}.cover h1{font-size:27px;margin:5px 0;color:#193e63}.muted{color:#687b90}.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:16px 0}.meta{padding:10px;background:#f2f6fa;border:1px solid #dce5ef;border-radius:8px}.meta b{display:block;color:#71849a;font-size:9px;text-transform:uppercase}.meta span{font-size:12px;font-weight:700}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:15px 0}.kpi{padding:11px;border:1px solid #dce5ef;border-radius:8px;background:#f7f9fc}.kpi b{font-size:20px;color:#245b91;display:block}.kpi span{font-size:9px;color:#6b7d91}.section{margin:20px 0;break-inside:auto}.section h2{font-size:16px;color:#214b75;border-bottom:1px solid #dce5ef;padding-bottom:6px;margin:0 0 9px}.section h3{font-size:13px;color:#315d88;margin:14px 0 6px}table{width:100%;border-collapse:collapse;font-size:10px;margin:8px 0 10px}th,td{padding:6px 7px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}th{background:#f0f5fa;color:#4d6278;font-weight:700}.table-wrap{overflow:visible}.note{padding:10px 12px;background:#f2f7fc;border-left:3px solid #3478c5;margin:10px 0}.warning{padding:10px 12px;background:#fff8e8;border-left:3px solid #c18a23;margin:10px 0}.chart{border:1px solid #e1e8f0;border-radius:8px;padding:10px;margin:10px 0}.chart svg{width:100%;height:auto}.empty{color:#8796a7;font-style:italic}.footer{margin-top:24px;padding-top:10px;border-top:1px solid #dce5ef;font-size:9px;color:#74869a}.page-break{break-before:page;page-break-before:always}.keep{break-inside:avoid;page-break-inside:avoid}.small{font-size:9px;color:#73849a}.actions{display:flex;gap:8px;margin-bottom:16px}.actions button{border:0;border-radius:7px;padding:10px 14px;background:#286baa;color:white;font-weight:bold;cursor:pointer}.actions button.secondary{background:#eaf0f7;color:#29455f}@page{size:A4;margin:13mm}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.actions{display:none!important}main{padding:0;max-width:none}.section{break-inside:auto}.keep{break-inside:avoid;page-break-inside:avoid}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}}
+  </style></head><body><main><div class="actions"><button onclick="window.print()">Guardar como PDF / Imprimir</button><button class="secondary" onclick="window.close()">Cerrar informe</button><span class="small" style="align-self:center">En el diálogo de impresión, selecciona “Guardar como PDF”.</span></div>
+  <header class="cover"><div class="eyebrow">Control de fuerza en lucha · Informe individual</div><h1>Evaluación del proceso de ocho semanas</h1><div class="muted">Deportista: <b>${esc(athlete?.full_name||currentHeader())}</b> · Generado el ${esc(generated)}</div><div class="small">Informe elaborado a partir de los registros disponibles en la plataforma. No sustituye la interpretación del entrenador.</div></header>
+  <section class="section"><h2>1. Caracterización del deportista</h2><div class="meta-grid">${meta.map(([k,v])=>`<div class="meta"><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join('')}</div><div class="note">El proceso se organiza en ocho semanas: adaptación (1–2), aumento (3–4), punto álgido (5–6) y tapering (7–8). La periodización es una estructura orientativa; las decisiones se interpretan según la respuesta individual.</div></section>
+  <section class="section"><h2>2. Indicadores globales del proceso</h2><div class="kpis"><div class="kpi"><b>${completed.length}</b><span>Sesiones realizadas</span></div><div class="kpi"><b>${planned.length}</b><span>Sesiones planificadas pendientes</span></div><div class="kpi"><b>${totalLoad==null?'—':totalLoad.toFixed(1)+' UA'}</b><span>Carga sRPE acumulada con datos completos</span></div><div class="kpi"><b>${avgRpe==null?'—':avgRpe.toFixed(1)+'/10'}</b><span>RPE medio de sesiones realizadas</span></div></div><p class="small">Cobertura de semanas con al menos un registro: ${weeklyCoverage}/8. Una semana sin datos no equivale a una semana sin carga o sin fatiga.</p></section>
+  <section class="section"><h2>3. Seguimiento semanal de las ocho semanas</h2><div class="table-wrap"><table><thead><tr><th>Sem.</th><th>Etapa</th><th>Realizadas / planificadas</th><th>RPE medio</th><th>Fatiga media</th><th>Carga UA</th><th>Minutos</th><th>Pruebas</th><th>Decisiones</th></tr></thead><tbody>${escRows(weekRows)}</tbody></table></div><p class="small">Carga sRPE por sesión = RPE global × duración real en minutos. Solo se suman sesiones realizadas con ambos datos disponibles.</p></section>
+  <section class="section keep"><h2>4. Distribución de carga interna semanal</h2><div class="chart">${reportSvgBars(weekly)}</div><p class="small">Las barras sin valor indican ausencia de registros completos de carga en esa semana.</p></section>
+  <section class="section keep"><h2>5. Evolución de bienestar: fatiga percibida</h2><div class="chart">${reportFatigueSvg(weekly)}</div><p class="small">Se muestra el promedio de los registros de fatiga de cada semana, en escala 1–10. No se imputan valores en semanas sin registros.</p></section>
+  <section class="section page-break"><h2>6. Sesiones registradas</h2><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Sem.</th><th>Tipo de sesión</th><th>Estado</th><th>Duración</th><th>RPE</th><th>Carga</th></tr></thead><tbody>${sessionRows.length?escRows(sessionRows):'<tr><td colspan="7" class="empty">No hay sesiones registradas.</td></tr>'}</tbody></table></div></section>
+  <section class="section"><h2>7. Detalle de ejercicios realizados</h2><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Sem.</th><th>Tipo de sesión</th><th>Ejercicio</th><th>Series × reps</th><th>Carga</th><th>CE</th><th>RPE ej.</th></tr></thead><tbody>${exerciseRowsHtml.length?escRows(exerciseRowsHtml):'<tr><td colspan="8" class="empty">No hay detalles de ejercicios registrados.</td></tr>'}</tbody></table></div></section>
+  <section class="section page-break"><h2>8. Evaluación de pruebas físicas</h2><div class="table-wrap"><table><thead><tr><th>Prueba</th><th>Primer resultado</th><th>Último resultado</th><th>Variación</th><th>N.º registros</th></tr></thead><tbody>${testRows.length?escRows(testRows):'<tr><td colspan="5" class="empty">No hay pruebas físicas registradas.</td></tr>'}</tbody></table></div><p class="small">La variación porcentual es descriptiva. En pruebas cronometradas, una reducción del tiempo puede representar mejora. Para comparar se requiere mantener el mismo protocolo, unidades y condiciones.</p></section>
+  <section class="section"><h2>9. Historial de lesiones</h2><div class="table-wrap"><table><thead><tr><th>Zona</th><th>Lesión</th><th>Grado</th><th>Lateralidad</th><th>Fecha</th><th>Estado</th><th>Dolor</th><th>Restricciones</th><th>Orientación profesional</th></tr></thead><tbody>${injuryRows.length?escRows(injuryRows):'<tr><td colspan="9" class="empty">No hay lesiones registradas.</td></tr>'}</tbody></table></div><p class="small">La presencia de un antecedente no determina por sí sola la exclusión de ejercicios. Las restricciones deben interpretarse según el estado actual y la orientación profesional registrada.</p></section>
+  <section class="section"><h2>10. Decisiones y ajustes del entrenador</h2><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Semana</th><th>Decisión</th><th>Justificación registrada</th></tr></thead><tbody>${decisionRows.length?escRows(decisionRows):'<tr><td colspan="4" class="empty">No hay decisiones registradas.</td></tr>'}</tbody></table></div></section>
+  <section class="section"><h2>11. Consideraciones para la interpretación</h2><div class="warning">Este informe compila datos registrados en la aplicación. La ausencia de registros no debe interpretarse como ausencia de entrenamiento, fatiga o lesión. Verifica la integridad de los datos, la consistencia de los protocolos y el contexto técnico-táctico antes de extraer conclusiones.</div><p>La carga sRPE es un indicador de carga interna percibida y debe analizarse junto con bienestar, rendimiento, carácter del esfuerzo, programación y observación técnica. No constituye por sí sola un umbral universal de lesión ni una orden automática de modificar la carga.</p></section>
+  <div class="footer">Control de fuerza en lucha · Documento académico individual · Datos personales y registros deportivos: conservar y compartir de forma responsable.</div></main></body></html>`;
+  win.document.open();win.document.write(doc);win.document.close();
+ }catch(err){win.close();alert('No se pudo generar el informe: '+(err.message||err));}
+}
+
+
+const originalViewEvaluationForReport=viewEvaluation;
+viewEvaluation=async function(c){
+ await originalViewEvaluationForReport(c);
+ const heading=c.querySelector('.card');
+ if(heading){const actions=document.createElement('div');actions.className='report-actions';actions.innerHTML='<button type="button" class="report-button" id="generatePdfReport">Generar informe individual en PDF</button>';heading.insertAdjacentElement('beforebegin',actions);}
+ const btn=$('generatePdfReport');if(btn)btn.onclick=()=>openEightWeekPdfReport();
+};
 const oldRender=render;render=async function(){await oldRender();setupForms()};
 restoreConfig();
 </script>
