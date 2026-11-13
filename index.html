@@ -292,7 +292,7 @@ function navGlyph(key){const icons={overview:'▦',athletes:'♙',profile:'◉',
 function buildNav(){
  const groups=profile.role==='coach'?
   [['GENERAL',[['overview','Resumen'],['athletes','Deportistas']]],['SEGUIMIENTO',[['wellness','Bienestar'],['injuries','Lesiones']]],['ENTRENAMIENTO',[['sessions','Sesiones'],['exerciseBank','Banco de ejercicios'],['planner','Planificador diario']]],['EVALUACIÓN',[['tests','Pruebas y rendimiento'],['decisions','Decisiones'],['evaluation','Evaluación']]]]:
-  [['GENERAL',[['overview','Mi resumen'],['profile','Mi perfil']]],['SEGUIMIENTO',[['wellness','Bienestar'],['injuries','Mis lesiones']]],['ENTRENAMIENTO',[['sessions','Sesiones'],['exerciseBank','Banco de ejercicios']]],['EVALUACIÓN',[['tests','Pruebas físicas'],['decisions','Ajustes del entrenador'],['evaluation','Mi evolución']]]];
+  [['GENERAL',[['overview','Mi resumen'],['profile','Mi perfil']]],['SEGUIMIENTO',[['wellness','Bienestar'],['injuries','Mis lesiones']]],['ENTRENAMIENTO',[['sessions','Sesiones'],['exerciseBank','Banco de ejercicios']]],['EVALUACIÓN',[['tests','Pruebas y rendimiento'],['decisions','Ajustes del entrenador'],['evaluation','Mi evolución']]]];
  $('navigation').innerHTML=groups.map(([label,items])=>`<div class="nav-group"><div class="nav-group-label">${label}</div>${items.map(([k,v])=>`<button type="button" data-tab="${k}" class="nav-item ${tab===k?'active':''}">${navGlyph(k)}<span>${v}</span>${tab===k?'<i class="nav-active-mark"></i>':''}</button>`).join('')}</div>`).join('');
  $('navigation').querySelectorAll('button[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;buildNav();render();if(window.innerWidth<900)$('content').scrollIntoView({behavior:'smooth',block:'start'})});
 }
